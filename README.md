@@ -17,8 +17,14 @@ Feel free to clone this and modify it to your liking. And feel free to
 contribute patches.
 
 ### Build and run
-* docker build -t webapp .
-* docker run -d webapp
+    docker build -t webapp .
+    docker run \
+        -v ./:/project \
+        -e PUBLIC_PATH=/project/app \
+        -e TIMEZONE=Etc/UTC \
+        -p 80:80 \
+        -it --rm \
+        webapp
 
 ### How to insert your application
 

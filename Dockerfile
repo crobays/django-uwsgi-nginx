@@ -38,11 +38,14 @@ RUN apt-get install -y \
 # install uwsgi now because it takes a little while
 RUN easy_install pip
 RUN pip install uwsgi
+RUN pip install virtualenv
 
 # Exposed ENV
 ENV TIMEZONE Etc/UTC
 ENV ENVIRONMENT prod
-ENV PUBLIC_PATH /project/app
+ENV SRC /project/src
+ENV APP_NAME app
+ENV ENV_NAME env
 ENV NGINX_CONF nginx-virtual.conf
 
 VOLUME  ["/project"]
@@ -59,7 +62,7 @@ ADD /scripts/uwsgi-config.sh /etc/my_init.d/03-uwsgi-config.sh
 ADD /scripts/django-config.sh /etc/my_init.d/04-django-config.sh
 
 RUN mkdir /etc/service/nginx && echo "#!/bin/bash\nnginx" > /etc/service/nginx/run
-RUN mkdir /etc/service/uwsgi && echo "#!/bin/bash\n/usr/local/bin/uwsgi --ini /conf/uwsgi.ini" > /etc/service/uwsgi/run
+RUN mkdir /etc/service/uwsgi && echo "#!/bin/bash\nsource \$SRC/\$ENV_NAME/bin/activate && cd \$SRC && uwsgi --socket=/var/run/uwsgi.sock --chmod-socket=666 --home=\$SRC/\$ENV_NAME --module=\$APP_NAME.wsgi" > /etc/service/uwsgi/run
 
 RUN chmod +x /etc/my_init.d/* && chmod +x /etc/service/*/run
 
