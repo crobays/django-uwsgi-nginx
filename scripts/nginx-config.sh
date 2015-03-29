@@ -46,16 +46,15 @@ fi
 rm -rf /etc/nginx/sites-enabled/*
 cp -f "$file" /etc/nginx/sites-enabled/virtual.conf
 
-# php_code="echo '('.(array_key_exists('DOMAIN',\$_SERVER) ? str_replace('.', '\\\\\.', implode('|', array_unique(array_map(function(\$domain){\$d = array_reverse(explode('.', \$domain)); return \$d[1].'.'.\$d[0];}, in_array(substr(\$_SERVER['DOMAIN'], 0, 1), array('[', '{')) ? json_decode(str_replace(\"'\", '\"', \$_SERVER['DOMAIN']), 1) : array(\$_SERVER['DOMAIN']))))) : '').')';"
-# domain="$(php -r "$php_code")"
+if [ ! -d $PUBLIC_PATH/media ]
+then
+	mkdir -p $PUBLIC_PATH/media
+fi
 
-# if [ "$domain" == "()" ]
-# then
-# 	echo " ==> NOT using Access-Control-Allow-Origin headers"
-# 	php_code="file_put_contents('/etc/nginx/sites-enabled/virtual.conf', preg_replace('/# == add header ==(.|\n)*# == add header ==/', '', file_get_contents('/etc/nginx/sites-enabled/virtual.conf')));"
-# 	php -r "$php_code"
-# elif [ "$domain" ]
-# then
-# 	find_replace_add_string_to_file "example\\\.com" "$domain" /etc/nginx/sites-enabled/virtual.conf "Access-Control-Allow-Origin headers for $domain"
-# fi
+if [ ! -d $PUBLIC_PATH/static ]
+then
+	mkdir -p $PUBLIC_PATH/static
+fi
+
+find_replace_add_string_to_file "\$PUBLIC_PATH" "$PUBLIC_PATH" /etc/nginx/sites-enabled/virtual.conf "Set NGINX public directory"
 

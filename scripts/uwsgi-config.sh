@@ -28,20 +28,33 @@ function find_replace_add_string_to_file() {
 	echo " ==> Setting $label ($action) [$replace in $file]"
 }
 
-# if [ ! -f $SRC/uwsgi.ini ]
+# if [ ! -f $SRC_PATH/uwsgi.ini ]
 # then
-# 	mkdir -p $SRC
-# 	cp /conf/uwsgi.ini $SRC/uwsgi.ini
+# 	mkdir -p $SRC_PATH
+# 	cp /conf/uwsgi.ini $SRC_PATH/uwsgi.ini
 # 	if [ "$APP_NAME" ]
 # 	then
-# 		find_replace_add_string_to_file "chdir = .*" "chdir = $SRC" $SRC/uwsgi.ini "UWSGI project path"
-# 		find_replace_add_string_to_file "module = .*" "module = $APP_NAME.wsgi:application" $SRC/uwsgi.ini "UWSGI app module"
+# 		find_replace_add_string_to_file "chdir = .*" "chdir = $SRC_PATH" $SRC_PATH/uwsgi.ini "UWSGI project path"
+# 		find_replace_add_string_to_file "module = .*" "module = $APP_NAME.wsgi:application" $SRC_PATH/uwsgi.ini "UWSGI app module"
 # 	fi
 # fi
 
-if [ -f $SRC/uwsgi_params ]
+if [ -f $PROJECT_PATH/uwsgi_params ]
 then
-	cp -f $SRC/uwsgi_params /conf/uwsgi_params
+	cp -f $PROJECT_PATH/uwsgi_params /conf/uwsgi_params
 fi
 
+while read -r e
+do
+	strlen="${#e}"
+	if [ "${e:$strlen-1:1}" == "=" ] || [ "$e" == "${e/=/}" ] || [ $strlen -gt 100 ]
+	then
+		continue
+	fi
+	if [ "${e/ /}" != "$e" ]
+	then
+		continue
+	fi
 
+	echo -e "uwsgi_param   ${e/=/   };" >> /conf/uwsgi_params
+done <<< "$(env)"
