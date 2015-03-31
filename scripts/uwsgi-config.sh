@@ -28,20 +28,20 @@ function find_replace_add_string_to_file() {
 	echo " ==> Setting $label ($action) [$replace in $file]"
 }
 
-# if [ ! -f $SRC_PATH/uwsgi.ini ]
+# if [ ! -f /project/uwsgi.ini ]
 # then
-# 	mkdir -p $SRC_PATH
-# 	cp /conf/uwsgi.ini $SRC_PATH/uwsgi.ini
-# 	if [ "$APP_NAME" ]
+# 	mkdir -p /project
+# 	cp /conf/uwsgi.ini /project/uwsgi.ini
+# 	if [ "$PROJECT_NAME" ]
 # 	then
-# 		find_replace_add_string_to_file "chdir = .*" "chdir = $SRC_PATH" $SRC_PATH/uwsgi.ini "UWSGI project path"
-# 		find_replace_add_string_to_file "module = .*" "module = $APP_NAME.wsgi:application" $SRC_PATH/uwsgi.ini "UWSGI app module"
+# 		find_replace_add_string_to_file "chdir = .*" "chdir = /project" /project/uwsgi.ini "UWSGI project path"
+# 		find_replace_add_string_to_file "module = .*" "module = $PROJECT_NAME.wsgi:application" /project/uwsgi.ini "UWSGI app module"
 # 	fi
 # fi
 
-if [ -f $PROJECT_PATH/uwsgi_params ]
+if [ -f /project/uwsgi_params ]
 then
-	cp -f $PROJECT_PATH/uwsgi_params /conf/uwsgi_params
+	cp -f /project/uwsgi_params /conf/uwsgi_params
 fi
 
 while read -r e

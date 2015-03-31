@@ -24,7 +24,8 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN add-apt-repository -y ppa:nginx/stable && \
 	apt-get update && \
 	apt-get -y dist-upgrade && \
-	apt-get install -y software-properties-common
+	apt-get install -y software-properties-common && \
+	apt-get update
 
 RUN apt-get install -y \
 	nginx \
@@ -33,6 +34,7 @@ RUN apt-get install -y \
 	python-dev \
 	python-setuptools \
 	sqlite3 \
+	libmysqlclient-dev \
 	supervisor
 
 # install uwsgi now because it takes a little while
@@ -44,10 +46,8 @@ RUN pip install virtualenv
 ENV TIMEZONE Etc/UTC
 ENV ENVIRONMENT prod
 ENV PYTHON_VERSION 2
-ENV PROJECT_PATH /project
-ENV PUBLIC_PATH /project/public
-ENV APP_NAME app
-ENV ENV_NAME env
+ENV CODE_DIR src
+ENV PROJECT_NAME main
 ENV NGINX_CONF nginx-virtual.conf
 
 VOLUME /project
@@ -64,7 +64,7 @@ ADD /scripts/uwsgi-config.sh /etc/my_init.d/03-uwsgi-config.sh
 ADD /scripts/django-config.sh /etc/my_init.d/04-django-config.sh
 
 RUN mkdir /etc/service/nginx && echo "#!/bin/bash\nnginx" > /etc/service/nginx/run
-RUN mkdir /etc/service/uwsgi && echo "#!/bin/bash\nsource \$PROJECT_PATH/\$ENV_NAME/bin/activate && cd \$PROJECT_PATH && uwsgi --socket=/var/run/uwsgi.sock --chmod-socket=666 --home=\$PROJECT_PATH/\$ENV_NAME --module=\$APP_NAME.wsgi" > /etc/service/uwsgi/run
+RUN mkdir /etc/service/uwsgi && echo "#!/bin/bash\nsource /project/bin/activate && cd /project && uwsgi --socket=/var/run/uwsgi.sock --chmod-socket=666 --home=/project --pythonpath=/project/$CODE_DIR --module=$PROJECT_NAME.wsgi" > /etc/service/uwsgi/run
 
 RUN chmod +x /etc/my_init.d/* && chmod +x /etc/service/*/run
 

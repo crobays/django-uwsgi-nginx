@@ -30,14 +30,14 @@ function find_replace_add_string_to_file() {
 
 function fix_python_exec_path()
 {
-	for file in $PROJECT_PATH/$ENV_NAME/bin/*
+	for file in /project/bin/*
 	do
 		if [ ! -f $file ]
 		then
 			continue
 		fi
-		find="\#\!$PROJECT_PATH/$ENV_NAME/bin/python$PYTHON_VERSION"
-		find2="\#\!$PROJECT_PATH/$ENV_NAME/bin/python"
+		find="\#\!/project/bin/python$PYTHON_VERSION"
+		find2="\#\!/project/bin/python"
 		find_escaped="${find//\//\\/}"
 		find_escaped2="${find2//\//\\/}"
 		replace="#!/usr/bin/env python"
@@ -50,57 +50,64 @@ function fix_python_exec_path()
 # install django, normally you would remove this step because your project would already
 # be installed in the code/app/ directory
 
-if [ ! -d $PROJECT_PATH ]
+if [ ! -d /project ]
 then
-	mkdir -p $PROJECT_PATH
+	mkdir -p /project
 fi
 
-if [ ! -f $PROJECT_PATH/requirements.txt ]
+if [ ! -f /project/requirements.txt ]
 then
-	cp /conf/requirements.txt $PROJECT_PATH/requirements.txt
+	cp /conf/requirements.txt /project/requirements.txt
 fi
 
-if [ ! -d $PROJECT_PATH/$ENV_NAME ]
-then
-	virtualenv $PROJECT_PATH/$ENV_NAME --python "python$PYTHON_VERSION"
-	fix_python_exec_path
-fi
-
-echo -e '#!/bin/bash' > /root/.bashrc
-echo -e 'export PATH="$PROJECT_PATH/$ENV_NAME/bin:$PATH"' >> /root/.bashrc
-echo -e 'source $PROJECT_PATH/$ENV_NAME/bin/activate' >> /root/.bashrc
-chmod +x $PROJECT_PATH/$ENV_NAME/bin/*
-chmod +x /root/.bashrc
-
-find_replace_add_string_to_file "VIRTUAL_ENV=.*" "VIRTUAL_ENV=\"$PROJECT_PATH/$ENV_NAME\";if [ -d $ENV_NAME ];then VIRTUAL_ENV=\"\$PWD/$ENV_NAME\";fi" $PROJECT_PATH/$ENV_NAME/bin/activate "Modify activate script" 
-
-source /root/.bashrc
-$PROJECT_PATH/$ENV_NAME/bin/pip install -r $PROJECT_PATH/requirements.txt
+virtualenv /project --python "python$PYTHON_VERSION"
 fix_python_exec_path
 
-if [ ! -d $PROJECT_PATH/$APP_NAME ]
+echo -e '#!/bin/bash' > /root/.bashrc
+echo -e 'export PATH="/project/bin:$PATH"' >> /root/.bashrc
+echo -e 'source /project/bin/activate' >> /root/.bashrc
+chmod +x /project/bin/*
+chmod +x /root/.bashrc
+
+find_replace_add_string_to_file "VIRTUAL_ENV=.*" "VIRTUAL_ENV=\"/project\";if [ -d ];then VIRTUAL_ENV=\"\$PWD\";fi" /project/bin/activate "Modify activate script" 
+
+source /root/.bashrc
+/project/bin/pip install -r /project/requirements.txt
+fix_python_exec_path
+
+if [ ! -d /project/$CODE_DIR ]
 then
-	$PROJECT_PATH/$ENV_NAME/bin/django-admin.py startproject $APP_NAME $PROJECT_PATH
+	mkdir -p /project/$CODE_DIR
+	/project/bin/django-admin.py startproject $PROJECT_NAME /project/$CODE_DIR
 	fix_python_exec_path
 fi
 
-if [ $TIMEZONE ] && [ -f $PROJECT_PATH/$APP_NAME/settings.py ]
+# if [ ! -d /project/$CODE_DIR/$PROJECT_NAME/$APP_NAME ]
+# then
+# 	if [ $APP_TEMPLATE ]
+# 	then
+# 		template="--template=$APP_TEMPLATE"
+# 	fi
+# 	/project/bin/django-admin.py startapp $template $APP_NAME /project/$CODE_DIR/$PROJECT_NAME
+# 	fix_python_exec_path
+# fi
+
+if [ $TIMEZONE ] && [ -f /project/$CODE_DIR/$PROJECT_NAME/settings.py ]
 then
-	find_replace_add_string_to_file "TIME_ZONE = .*" "TIME_ZONE = '$TIMEZONE'" $PROJECT_PATH/$APP_NAME/settings.py "Set $APP_NAME Timezone"
+	find_replace_add_string_to_file "TIME_ZONE = .*" "TIME_ZONE = '$TIMEZONE'" /project/$CODE_DIR/$PROJECT_NAME/settings.py "Set $CODE_DIR/$PROJECT_NAME Timezone"
 fi
 
-echo "project path: $PROJECT_PATH"
-echo "project app: $APP_NAME"
-echo "project env: $ENV_NAME"
+echo "code directory: $CODE_DIR"
+echo "project: $CODE_DIR/$PROJECT_NAME"
 
-if [ ! -d $PUBLIC_PATH/static/admin ]
+if [ ! -d /project/static/admin ]
 then
-	mkdir -p $PUBLIC_PATH/static
-	python_dir=$(ls -r $PROJECT_PATH/$ENV_NAME/lib | head -n 1)
-	if [ -d $PROJECT_PATH/$ENV_NAME/lib/$python_dir/site-packages/django/contrib/admin/static/admin ]
+	mkdir -p /project/static
+	python_dir=$(ls -r /project/lib | head -n 1)
+	if [ -d /project/lib/$python_dir/site-packages/django/contrib/admin/static/admin ]
 	then
-		cp -r $PROJECT_PATH/$ENV_NAME/lib/$python_dir/site-packages/django/contrib/admin/static/admin $PUBLIC_PATH/static/admin
+		cp -r /project/lib/$python_dir/site-packages/django/contrib/admin/static/admin /project/static/admin
 	else
-		echo "No static files for admin found: $PROJECT_PATH/$ENV_NAME/lib/$python_dir/site-packages/django/contrib/admin/static/admin"
+		echo "No static files for admin found: /project/lib/$python_dir/site-packages/django/contrib/admin/static/admin"
 	fi
 fi

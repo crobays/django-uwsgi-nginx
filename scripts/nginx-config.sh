@@ -46,15 +46,14 @@ fi
 rm -rf /etc/nginx/sites-enabled/*
 cp -f "$file" /etc/nginx/sites-enabled/virtual.conf
 
-if [ ! -d $PUBLIC_PATH/media ]
+if [ ! -d /project/media ]
 then
-	mkdir -p $PUBLIC_PATH/media
+	mkdir -p /project/media
 fi
 
-if [ ! -d $PUBLIC_PATH/static ]
+if [ ! -d /project/static ]
 then
-	mkdir -p $PUBLIC_PATH/static
+	mkdir -p /project/static
 fi
 
-find_replace_add_string_to_file "\$PUBLIC_PATH" "$PUBLIC_PATH" /etc/nginx/sites-enabled/virtual.conf "Set NGINX public directory"
 
