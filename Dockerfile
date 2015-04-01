@@ -44,7 +44,7 @@ RUN pip install virtualenv
 
 # Exposed ENV
 ENV TIMEZONE Etc/UTC
-ENV ENVIRONMENT prod
+ENV ENVIRONMENT production
 ENV PYTHON_VERSION 2
 ENV CODE_DIR src
 ENV PROJECT_NAME main
@@ -64,7 +64,7 @@ ADD /scripts/uwsgi-config.sh /etc/my_init.d/03-uwsgi-config.sh
 ADD /scripts/django-config.sh /etc/my_init.d/04-django-config.sh
 
 RUN mkdir /etc/service/nginx && echo "#!/bin/bash\nnginx" > /etc/service/nginx/run
-RUN mkdir /etc/service/uwsgi && echo "#!/bin/bash\nsource /project/bin/activate && cd /project && uwsgi --socket=/var/run/uwsgi.sock --chmod-socket=666 --home=/project --pythonpath=/project/$CODE_DIR --module=$PROJECT_NAME.wsgi" > /etc/service/uwsgi/run
+RUN mkdir /etc/service/uwsgi && echo "#!/bin/bash\nsource /project/bin/activate && cd /project && uwsgi --socket=/var/run/uwsgi.sock --chmod-socket=666 --home=/project --pythonpath=/project/$CODE_DIR --module=$PROJECT_NAME.wsgi-docker" > /etc/service/uwsgi/run
 
 RUN chmod +x /etc/my_init.d/* && chmod +x /etc/service/*/run
 
