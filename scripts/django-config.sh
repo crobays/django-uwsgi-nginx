@@ -61,6 +61,7 @@ then
 fi
 
 virtualenv /project --python "python$PYTHON_VERSION"
+rm -rf /project/local
 fix_python_exec_path
 
 echo -e '#!/bin/bash' > /root/.bashrc
