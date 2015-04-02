@@ -37,7 +37,7 @@ function fix_python_exec_path()
 			continue
 		fi
 		find="\#\!/project/bin/python$PYTHON_VERSION"
-		find2="\#\!/project/bin/python"
+		find2="\#\!/.*/bin/python"
 		find_escaped="${find//\//\\/}"
 		find_escaped2="${find2//\//\\/}"
 		replace="#!/usr/bin/env python"
@@ -69,7 +69,7 @@ echo -e 'source /project/bin/activate' >> /root/.bashrc
 chmod +x /project/bin/*
 chmod +x /root/.bashrc
 
-find_replace_add_string_to_file "VIRTUAL_ENV=.*" "VIRTUAL_ENV=\"/project\";if [ -d ];then VIRTUAL_ENV=\"\$PWD\";fi" /project/bin/activate "Modify activate script" 
+find_replace_add_string_to_file "VIRTUAL_ENV=.*" "VIRTUAL_ENV=\"\$PWD\";if [ -d /project ];then VIRTUAL_ENV=\"/project\";fi" /project/bin/activate "Modify activate script"
 
 source /root/.bashrc
 /project/bin/pip install -r /project/requirements.txt
