@@ -62,6 +62,7 @@ RUN echo "#!/bin/bash\necho \"\$TIMEZONE\" > /etc/timezone && dpkg-reconfigure -
 ADD /scripts/nginx-config.sh /etc/my_init.d/02-nginx-config.sh
 ADD /scripts/uwsgi-config.sh /etc/my_init.d/03-uwsgi-config.sh
 ADD /scripts/django-config.sh /etc/my_init.d/04-django-config.sh
+ADD /scripts/django-config.sh /etc/my_init.d/05-git-config.sh
 
 RUN mkdir /etc/service/nginx && echo "#!/bin/bash\nnginx" > /etc/service/nginx/run
 RUN mkdir /etc/service/uwsgi && echo "#!/bin/bash\nexport APPLICATION_ENV=\"\${APPLICATION_ENV:-\$ENVIRONMENT}\"\nwsgi_file=\"wsgi\"\nif [ -f /project/\$CODE_DIR/\$PROJECT_NAME/wsgi-docker.py ]\nthen wsgi_file=\"wsgi-docker\"\nfi\nsource /project/bin/activate && cd /project && uwsgi --socket=/var/run/uwsgi.sock --chmod-socket=666 --home=/project --pythonpath=/project/\$CODE_DIR --module=$PROJECT_NAME.\$wsgi_file" > /etc/service/uwsgi/run
