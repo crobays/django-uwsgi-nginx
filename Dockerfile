@@ -54,7 +54,7 @@ VOLUME /project
 WORKDIR /project
 
 # HTTP ports
-EXPOSE 80 443
+EXPOSE 80 8000 443
 
 RUN echo '/sbin/my_init' > /root/.bash_history
 
@@ -64,7 +64,8 @@ ADD /scripts/uwsgi-config.sh /etc/my_init.d/03-uwsgi-config.sh
 ADD /scripts/django-config.sh /etc/my_init.d/04-django-config.sh
 
 RUN mkdir /etc/service/nginx && echo "#!/bin/bash\nnginx" > /etc/service/nginx/run
-RUN mkdir /etc/service/uwsgi && echo "#!/bin/bash\nsource /project/bin/activate && cd /project && uwsgi --socket=/var/run/uwsgi.sock --chmod-socket=666 --home=/project --pythonpath=/project/$CODE_DIR --module=$PROJECT_NAME.wsgi-docker" > /etc/service/uwsgi/run
+RUN mkdir /etc/service/uwsgi && echo "#!/bin/bash\nexport APPLICATION_ENV=\"\${APPLICATION_ENV:-\$ENVIRONMENT}\"\nwsgi_file=\"wsgi\"\nif [ -f /project/\$CODE_DIR/\$PROJECT_NAME/wsgi-docker.py ]\nthen wsgi_file=\"wsgi-docker\"\nfi\nsource /project/bin/activate && cd /project && uwsgi --socket=/var/run/uwsgi.sock --chmod-socket=666 --home=/project --pythonpath=/project/\$CODE_DIR --module=$PROJECT_NAME.\$wsgi_file" > /etc/service/uwsgi/run
+RUN mkdir /etc/service/runserver && echo "#!/bin/bash\nexport APPLICATION_ENV=\"\${APPLICATION_ENV:-\$ENVIRONMENT}\"\nsource /project/bin/activate && python /project/\$CODE_DIR/manage.py runserver 0.0.0.0:8000" > /etc/service/runserver/run
 
 RUN chmod +x /etc/my_init.d/* && chmod +x /etc/service/*/run
 
