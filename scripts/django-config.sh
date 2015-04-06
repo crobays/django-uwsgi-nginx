@@ -79,7 +79,7 @@ fix_python_exec_path
 
 if [ ! -d /project/$CODE_DIR ]
 then
-	if [ "$CUSTOM_BOILERPLATE" == "False" ]
+	if [ "$CUSTOM_BOILERPLATE" == "false" ] || [ "$CUSTOM_BOILERPLATE" == "False" ] || [ "$CUSTOM_BOILERPLATE" == "0" ]
 	then
 		mkdir -p /project/$CODE_DIR
 		/project/bin/django-admin.py startproject $PROJECT_NAME /project/$CODE_DIR

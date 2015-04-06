@@ -113,18 +113,27 @@ KEEP_COMMENTS_ON_MINIFYING = True
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'HOST': 'localhost',
-        'NAME': '',
-        'USER': '',
-        'PASSWORD': '',
-        'CONN_MAX_AGE': 300,
-        'ATOMIC_REQUESTS': True,
-        'OPTIONS': {
-            'init_command': 'SET storage_engine=INNODB',
-        }
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+
+
+if os.environ.get('DB_PORT_3306_TCP_ADDR'):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'HOST': os.environ.get('DB_PORT_3306_TCP_ADDR'),
+            'NAME': os.environ.get('DB_ENV_DATABASE'),
+            'USER': os.environ.get('DB_ENV_USER'),
+            'PASSWORD': os.environ.get('DB_ENV_PASS'),
+            'CONN_MAX_AGE': 300,
+            'ATOMIC_REQUESTS': True,
+            'OPTIONS': {
+                'init_command': 'SET storage_engine=INNODB',
+            }
+        }
+    }
 
 # Running test
 if 'test' in sys.argv:

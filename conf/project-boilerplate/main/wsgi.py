@@ -8,7 +8,7 @@ https://docs.djangoproject.com/en/1.7/howto/deployment/wsgi/
 """
 
 import os
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "main.settings.{}-docker".format(os.environ.get('APPLICATION_ENV', 'production')))
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "main.settings.{}".format(os.environ.get('APPLICATION_ENV', 'production')))
 
 from django.core.wsgi import get_wsgi_application
 application = get_wsgi_application()

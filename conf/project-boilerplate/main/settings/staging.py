@@ -21,12 +21,6 @@ INSTALLED_APPS += (
 # SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 # SESSION_CACHE_ALIAS = 'default'
 
-# Set database
-# DATABASES['default']['HOST'] = ''
-# DATABASES['default']['NAME'] = ''
-# DATABASES['default']['USER'] = ''
-# DATABASES['default']['PASSWORD'] = ''
-
 # Media and static setup
 # MEDIA_URL = 'http://assets-www.example.com/media/'
 # STATIC_URL = 'http://assets-www.example.com/static/'

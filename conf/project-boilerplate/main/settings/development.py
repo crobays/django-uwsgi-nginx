@@ -9,6 +9,13 @@ INSTALLED_APPS += (
     'debug_toolbar',
 )
 
+def custom_show_toolbar(self):
+    return True
+
+DEBUG_TOOLBAR_CONFIG = {
+    'SHOW_TOOLBAR_CALLBACK': custom_show_toolbar,
+}
+
 DEBUG_TOOLBAR_PATCH_SETTINGS = False
 
 # Fake cache for development
@@ -17,12 +24,6 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
     }
 }
-
-# Set database
-# DATABASES['default']['HOST'] = ''
-# DATABASES['default']['NAME'] = ''
-# DATABASES['default']['USER'] = ''
-# DATABASES['default']['PASSWORD'] = ''
 
 # Media and static setup
 # MEDIA_URL = '/media/'
