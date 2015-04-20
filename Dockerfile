@@ -12,14 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM phusion/baseimage:0.9.16
-ENV HOME /root
-RUN /etc/my_init.d/00_regen_ssh_host_keys.sh
-CMD ["/sbin/my_init"]
+FROM crobays/django-uwsgi
 
-MAINTAINER Crobays <crobays@userex.nl>
 ENV DOCKER_NAME django-uwsgi-nginx
-ENV DEBIAN_FRONTEND noninteractive
 
 RUN add-apt-repository -y ppa:nginx/stable && \
 	apt-get update && \
@@ -28,19 +23,7 @@ RUN add-apt-repository -y ppa:nginx/stable && \
 	apt-get update
 
 RUN apt-get install -y \
-	nginx \
-	python-software-properties \
-	python \
-	python-dev \
-	python-setuptools \
-	sqlite3 \
-	libmysqlclient-dev \
-	supervisor
-
-# install uwsgi now because it takes a little while
-RUN easy_install pip
-RUN pip install uwsgi
-RUN pip install virtualenv
+	nginx
 
 # Exposed ENV
 ENV TIMEZONE Etc/UTC
@@ -55,19 +38,12 @@ VOLUME /project
 WORKDIR /project
 
 # HTTP ports
-EXPOSE 80 8000 443
+EXPOSE 80 443
 
-RUN echo '/sbin/my_init' > /root/.bash_history
+ADD /scripts/nginx-config.sh /etc/my_init.d/06-nginx-config.sh
 
-RUN echo "#!/bin/bash\necho \"\$TIMEZONE\" > /etc/timezone && dpkg-reconfigure -f noninteractive tzdata" > /etc/my_init.d/01-timezone.sh
-ADD /scripts/nginx-config.sh /etc/my_init.d/02-nginx-config.sh
-ADD /scripts/uwsgi-config.sh /etc/my_init.d/03-uwsgi-config.sh
-ADD /scripts/django-config.sh /etc/my_init.d/04-django-config.sh
-ADD /scripts/django-config.sh /etc/my_init.d/05-git-config.sh
-
+RUN rm -rf /etc/service/runsv
 RUN mkdir /etc/service/nginx && echo "#!/bin/bash\nnginx" > /etc/service/nginx/run
-RUN mkdir /etc/service/uwsgi && echo "#!/bin/bash\nexport APPLICATION_ENV=\"\${APPLICATION_ENV:-\$ENVIRONMENT}\"\nwsgi_file=\"wsgi\"\nif [ -f /project/\$CODE_DIR/\$PROJECT_NAME/wsgi-docker.py ]\nthen wsgi_file=\"wsgi-docker\"\nfi\nsource /project/bin/activate && cd /project && uwsgi --socket=/var/run/uwsgi.sock --chmod-socket=666 --home=/project --pythonpath=/project/\$CODE_DIR --module=\$PROJECT_NAME.\$wsgi_file" > /etc/service/uwsgi/run
-RUN mkdir /etc/service/runsv && echo "#!/bin/bash\nexport APPLICATION_ENV=\"\${APPLICATION_ENV:-\$ENVIRONMENT}\"\nmanage_file=\"manage\"\nif [ -f /project/\$CODE_DIR/manage-docker.py ]\nthen manage_file=\"manage-docker\"\nfi\nsource /project/bin/activate && python /project/\$CODE_DIR/\$manage_file.py runserver 0.0.0.0:8000" > /etc/service/runsv/run
 
 RUN chmod +x /etc/my_init.d/* && chmod +x /etc/service/*/run
 
